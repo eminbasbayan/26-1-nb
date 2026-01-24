@@ -1,14 +1,19 @@
-const fs = require("node:fs").promises;
+const fs = require("node:fs")
 
-async function readFile() {
-    try {
-        const data = await fs.readFile("./file.txt", "utf-8");
-        console.log(data);
-    } catch (error) {
-        console.log(error);
-    }
+const readStream = fs.createReadStream("./file.txt", {
+    highWaterMark: 2
+});
 
-}
+readStream.on("data", (chunk) => {
+    console.log(chunk.toString());
+})
 
-readFile()
+readStream.on("end", () => {
+    console.log("İşlem Tamamlandı!");
+})
+
+readStream.on("error", (error) => {
+    console.log(error);
+})
+
 
