@@ -19,6 +19,14 @@ app.get('/products-page', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, 'views', 'products.html'));
 });
 
+app.get('/new-page', (req, res) => {
+  res.status(200).sendFile(path.join(__dirname, 'views', 'new-page.html'));
+});
+
+app.get("/old-page", (req, res)=> {
+  res.redirect(301, "/new-page")
+})
+
 app.get('/api/customers', (req, res) => {
   res.status(200).json(customers);
 });
