@@ -12,6 +12,15 @@ app.get('/', (req, res) => {
   res.json(users);
 });
 
+app.post('/api/users', (req, res) => {
+  const newUsers = [
+    ...users,
+    { id: 3, name: 'Emin', age: 28, email: 'emin@mail.com' },
+  ];
+
+  res.json(newUsers);
+});
+
 app.use((req, res) => {
   res.status(404).send('Page not found!');
 });
