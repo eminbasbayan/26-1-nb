@@ -61,6 +61,17 @@ app.put('/api/users/:userId', (req, res) => {
   }
 });
 
+app.delete('/api/users/:userId', (req, res) => {
+  const { userId } = req.params;
+
+  users = users.filter((user) => user.id !== Number(userId));
+
+  console.log(users);
+  
+
+  res.status(200).json(users);
+});
+
 app.use((req, res) => {
   res.status(404).send('Page not found!');
 });
