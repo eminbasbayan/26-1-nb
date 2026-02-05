@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const fs = require('node:fs');
 const path = require('node:path');
+const { logger } = require('./middleware/logEvents.js');
 const PORT = 3000;
 
 const corsOptions = {
@@ -28,16 +29,14 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Request log middleware
+app.use(logger);
+
 // Middleware to parse JSON badies
 app.use(express.json());
 
 // Content-Type application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
-
-let users = [
-  { id: 1, name: 'Ahmet', age: 25, email: 'ahmet@example.com' },
-  { id: 2, name: 'Ayşe', age: 30, email: 'ayse@example.com' },
-];
 
 const filePath = 'data.json';
 
