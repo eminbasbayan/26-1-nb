@@ -7,6 +7,9 @@ const PORT = 3000;
 // Middleware to parse JSON badies
 app.use(express.json());
 
+// Content-Type application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: false }));
+
 let users = [
   { id: 1, name: 'Ahmet', age: 25, email: 'ahmet@example.com' },
   { id: 2, name: 'Ayşe', age: 30, email: 'ayse@example.com' },
@@ -32,7 +35,7 @@ app.post('/api/users', (req, res) => {
   const users = readData();
   const newUsers = [...users, req.body];
 
-  writeData(newUsers)
+  writeData(newUsers);
 
   res.json(newUsers);
 });
@@ -80,13 +83,30 @@ app.put('/api/users/:userId', (req, res) => {
 
 app.delete('/api/users/:userId', (req, res) => {
   const { userId } = req.params;
-  let users = readData()
+  let users = readData();
 
   users = users.filter((user) => user.id !== Number(userId));
 
-  writeData(users)
+  writeData(users);
 
   res.status(200).json(users);
+});
+
+app.get('/add-new-user', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
+app.post('/submit', (req, res) => {
+  const users = readData();
+  const { name, age, email } = req.body;
+  const newUsers = [
+    ...users,
+    { id: users[users.length - 1].id + 1, name, age, email },
+  ];
+
+  writeData(newUsers);
+
+  res.send('Form verileri eklendi!');
 });
 
 app.use((req, res) => {
