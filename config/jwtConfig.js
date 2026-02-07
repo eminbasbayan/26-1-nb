@@ -1,4 +1,10 @@
 module.exports = {
-    secret: "42F0kuvY7zKUxy2LLZbMDJM/yxsEOUfKLGhHH0wwauo=",
-    expiresIn: "1d"
-}
+  accessToken: {
+    secret: process.env.JWT_ACCESS_SECRET,
+    expiresIn: '1m', // Short-lived
+  },
+  refreshToken: {
+    secret: process.env.JWT_REFRESH_SECRET,
+    expiresIn: '7d', // Longer-lived
+  },
+};
