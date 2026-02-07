@@ -1,6 +1,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { secret, expiresIn } = require('../config/jwtConfig');
 
 const registerUser = async (req, res) => {
   const email = req.body.email;
@@ -50,7 +52,7 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Geçersiz email veya şifre' });
     }
 
-    // Şifre Kontrolü                             // 123456     // $2b$10$bdH29/sfSfi0u0OYf2YZl.WQNaFJw8QpJBmVxz3afxKXdEhx.gntK    
+    // Şifre Kontrolü                             // 123456     // $2b$10$bdH29/sfSfi0u0OYf2YZl.WQNaFJw8QpJBmVxz3afxKXdEhx.gntK
     const validPassword = await bcryptjs.compare(password, findUser.password);
 
     if (!validPassword) {
@@ -59,7 +61,11 @@ const loginUser = async (req, res) => {
 
     const { password: _, ...user } = findUser;
 
-    res.status(200).json({ message: 'Giriş başarılı!', user });
+    const token = jwt.sign({ id: user.id, email: user.email, role: "admin" }, secret, {
+      expiresIn,
+    });
+
+    res.status(200).json({ message: 'Giriş başarılı!', user, token });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
