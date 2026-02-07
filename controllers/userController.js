@@ -82,10 +82,29 @@ const registerUser = (req, res) => {
   }
 };
 
+const loginUser = (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const usersFilePath = path.join(__dirname, '..', 'models', 'users.json');
+    const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf-8'));
+
+    const findUser = users.find((user) => user.email === email);
+
+    if (!findUser) {
+      return res.status(401).json({ message: 'Geçersiz email veya şifre' });
+    }
+
+    res.status(200).json({ message: 'Giriş başarılı!', findUser });
+  } catch (error) {
+     res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   createNewUser,
   updateUser,
   deleteUser,
-  registerUser
+  registerUser,
 };
