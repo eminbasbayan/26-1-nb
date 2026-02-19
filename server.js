@@ -7,7 +7,10 @@ const { logger } = require('./middleware/logEvents.js');
 const corsOptions = require('./config/corsConfig.js');
 const userRoutes = require('./routes/userRoutes.js');
 const authRoutes = require('./routes/authRoutes.js');
+const connectDB = require('./config/dbConfig.js');
 const PORT = 3000;
+
+connectDB()
 
 app.use(cors(corsOptions));
 
