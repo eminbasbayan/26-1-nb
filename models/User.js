@@ -15,6 +15,12 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Parola zorunludur!'],
       minlength: [6, 'Parola en az 6 karakter olmalıdır!'],
     },
+
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
   },
   {
     timestamps: true, // createdAt ve updatedAt otomatik eklenir

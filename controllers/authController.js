@@ -8,8 +8,9 @@ const RefreshToken = require('../models/RefreshToken');
 
 const generateTokens = (user) => {
   const userId = user._id ? user._id.toString() : user.id;
+  const userRole = user.role || 'user';
 
-  const accessTokenPayload = { id: userId, email: user.email };
+  const accessTokenPayload = { id: userId, email: user.email, role: userRole };
   const refreshTokenPayload = { id: userId };
 
   const newAccessToken = jwt.sign(accessTokenPayload, accessToken.secret, {
