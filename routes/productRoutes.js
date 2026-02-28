@@ -25,9 +25,53 @@ const { authorizeRoles } = require('../middleware/roles');
  *         price:
  *           type: number
  *         category:
- *           type: object
+ *           type: string
  *         description:
  *           type: string
+ *         inStock:
+ *           type: boolean
+ *         tags:
+ *           type: array
+ *           items:
+ *             type: string
+ *     ProductInput:
+ *       type: object
+ *       required:
+ *         - name
+ *         - price
+ *         - category
+ *       properties:
+ *         name:
+ *           type: string
+ *           maxLength: 120
+ *         price:
+ *           type: number
+ *           minimum: 0
+ *         category:
+ *           type: string
+ *         description:
+ *           type: string
+ *           maxLength: 100
+ *         inStock:
+ *           type: boolean
+ *         tags:
+ *           type: array
+ *           items:
+ *             type: string
+ *     ProductUpdateInput:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           maxLength: 120
+ *         price:
+ *           type: number
+ *           minimum: 0
+ *         category:
+ *           type: string
+ *         description:
+ *           type: string
+ *           maxLength: 100
  *         inStock:
  *           type: boolean
  *         tags:
@@ -52,6 +96,109 @@ const { authorizeRoles } = require('../middleware/roles');
  *         description: Yetkilendirme hatasi (token yok/gecersiz)
  *       403:
  *         description: Rol yetkisi yetersiz
+ *   post:
+ *     summary: Yeni urun olusturur
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ProductInput'
+ *     responses:
+ *       201:
+ *         description: Urun basariyla olusturuldu
+ *       400:
+ *         description: Validasyon hatasi veya gecersiz veri
+ *       401:
+ *         description: Yetkilendirme hatasi (token yok/gecersiz)
+ *       403:
+ *         description: Rol yetkisi yetersiz
+ */
+
+/**
+ * @swagger
+ * /api/products/by-categories:
+ *   get:
+ *     summary: Kategori adlarina gore urunleri listeler
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: categories
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Virgulle ayrilmis kategori adlari (ornek Elektronik,Giyim)
+ *     responses:
+ *       200:
+ *         description: Kategorilere gore urun listesi
+ *       400:
+ *         description: categories parametresi eksik/gecersiz
+ *       404:
+ *         description: Verilen kategoriler icin sonuc bulunamadi
+ */
+
+/**
+ * @swagger
+ * /api/products/{productId}:
+ *   put:
+ *     summary: Urun bilgilerini gunceller
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ProductUpdateInput'
+ *     responses:
+ *       200:
+ *         description: Urun basariyla guncellendi
+ *       400:
+ *         description: Validasyon hatasi veya gecersiz veri
+ *       401:
+ *         description: Yetkilendirme hatasi (token yok/gecersiz)
+ *       403:
+ *         description: Rol yetkisi yetersiz
+ *       404:
+ *         description: Urun bulunamadi
+ *   delete:
+ *     summary: Urunu siler
+ *     tags:
+ *       - Products
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Urun basariyla silindi
+ *       400:
+ *         description: Gecersiz productId
+ *       401:
+ *         description: Yetkilendirme hatasi (token yok/gecersiz)
+ *       403:
+ *         description: Rol yetkisi yetersiz
+ *       404:
+ *         description: Urun bulunamadi
  */
 router.get(
   '/',
@@ -62,6 +209,8 @@ router.get(
 
 router.get(
   '/by-categories',
+  verifyAccessToken,
+  authorizeRoles('admin'),
   getProductsByCategoriesValidator,
   validate,
   productController.getProductsByCategories,
@@ -79,7 +228,7 @@ router.post(
 router.put(
   '/:productId',
   verifyAccessToken,
-  authorizeRoles('user'),
+  authorizeRoles('admin'),
   updateProductValidator,
   validate,
   productController.updateProduct,
@@ -88,7 +237,7 @@ router.put(
 router.delete(
   '/:productId',
   verifyAccessToken,
-  authorizeRoles('admin', 'user'),
+  authorizeRoles('admin'),
   productIdParamValidator,
   validate,
   productController.deleteProduct,
