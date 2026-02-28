@@ -6,29 +6,60 @@ const userController = require('../controllers/userController');
  * @swagger
  * components:
  *   schemas:
- *     LegacyUser:
+ *     User:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
+ *         _id:
+ *           type: string
  *         email:
  *           type: string
  *           format: email
- *     LegacyUserCreateInput:
- *       type: object
- *       additionalProperties: true
- *       description: Bu endpoint validation kullanmadigi icin serbest payload kabul eder
- *     LegacyUserUpdateInput:
+ *         role:
+ *           type: string
+ *           enum:
+ *             - user
+ *             - admin
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *     UserCreateInput:
  *       type: object
  *       required:
- *         - id
  *         - email
+ *         - password
  *       properties:
- *         id:
- *           type: integer
  *         email:
  *           type: string
  *           format: email
+ *         password:
+ *           type: string
+ *           minLength: 6
+ *         role:
+ *           type: string
+ *           enum:
+ *             - user
+ *             - admin
+ *     UserUpdateInput:
+ *       type: object
+ *       required:
+ *         - userId
+ *       properties:
+ *         userId:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *         password:
+ *           type: string
+ *           minLength: 6
+ *         role:
+ *           type: string
+ *           enum:
+ *             - user
+ *             - admin
  */
 
 /**
@@ -41,6 +72,8 @@ const userController = require('../controllers/userController');
  *     responses:
  *       200:
  *         description: Basarili kullanici listesi
+ *       400:
+ *         description: Kullanici listesi getirilemedi
  *   post:
  *     summary: Yeni kullanici kaydi ekler
  *     tags:
@@ -50,12 +83,14 @@ const userController = require('../controllers/userController');
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LegacyUserCreateInput'
+ *             $ref: '#/components/schemas/UserCreateInput'
  *     responses:
- *       200:
- *         description: Guncel kullanici listesi doner
+ *       201:
+ *         description: Kullanici basariyla olusturuldu
+ *       400:
+ *         description: Gecersiz veri veya email zaten kayitli
  *   put:
- *     summary: Kullanici email bilgisini gunceller
+ *     summary: Kullanici bilgilerini gunceller
  *     tags:
  *       - Users
  *     requestBody:
@@ -63,10 +98,14 @@ const userController = require('../controllers/userController');
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LegacyUserUpdateInput'
+ *             $ref: '#/components/schemas/UserUpdateInput'
  *     responses:
  *       200:
- *         description: Guncelleme sonucu doner
+ *         description: Kullanici basariyla guncellendi
+ *       400:
+ *         description: Gecersiz veri veya userId eksik
+ *       404:
+ *         description: Kullanici bulunamadi
  */
 router.get('/', userController.getAllUsers);
 router.post('/', userController.createNewUser);
@@ -84,10 +123,14 @@ router.put('/', userController.updateUser);
  *         name: userId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
- *         description: Kalan kullanici listesi doner
+ *         description: Kullanici basariyla silindi
+ *       400:
+ *         description: Gecersiz userId
+ *       404:
+ *         description: Kullanici bulunamadi
  */
 router.delete('/:userId', userController.deleteUser);
 
